@@ -5,19 +5,6 @@
 //  Created by Igor Florentino on 18/03/24.
 //
 
-//import Foundation
-//
-//struct ExpenseItem {
-//	var name:String
-//	var type:String
-//	var amount: Double
-//}
-//
-//@Observable
-//class Expenses {
-//	var itens = [ExpenseItem]()
-//}
-
 
 import SwiftUI
 
@@ -34,12 +21,9 @@ struct ContentView: View {
 			}
 			.navigationTitle("iExpense")
 			.toolbar(content: {
-				Button("add expense", systemImage: "plus") {
-					showingAddExpense.toggle()
+				NavigationLink(destination: AddView(expenses: expenses)) {
+					Image(systemName: "plus")
 				}
-			})
-			.sheet(isPresented: $showingAddExpense, content: {
-				AddView(expenses: expenses)
 			})
 		}
     }
