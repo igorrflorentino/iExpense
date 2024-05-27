@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-
+import SwiftData
 
 struct AmountStyle: ViewModifier {
 	
@@ -35,7 +35,14 @@ extension View {
 }
 
 #Preview {
-	let expenseItemSample = ExpenseItem(name: "", type: "", amount: 10.4)
-	return Text(expenseItemSample.amount.formatted(.currency(code: "USD")))
-		.stylizeAmount(for: expenseItemSample.amount)
+	do {
+		let config = ModelConfiguration(isStoredInMemoryOnly: true)
+		let container = try ModelContainer(for: ExpenseItem.self, configurations: config)
+		let expenseItemSample = ExpenseItem.sampleItems[0]
+		return Text(expenseItemSample.amount.formatted(.currency(code: "USD")))
+			.stylizeAmount(for: expenseItemSample.amount)
+			.modelContainer(container)
+	} catch {
+		return Text("Failed to build container: \(error.localizedDescription)")
+	}
 }

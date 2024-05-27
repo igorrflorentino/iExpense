@@ -8,15 +8,14 @@
 import SwiftUI
 
 struct AddView: View {
+	@Environment(\.modelContext) var modelContext
+	@Environment(\.dismiss) var dismiss
 	
 	@State private var expenseDescription = "New Expense"
 	@State private var expenseAmount = 0.0
 	@State private var expenseType = allTypes[0]
-	@State var expenses: Expenses
 	
-	@Environment(\.dismiss) var dismiss
-	
-	static private let allTypes = ["Personal", "Business"]
+	static private let allTypes = ExpenseItem.allTypes
 	
 	var body: some View {
 		NavigationStack {
@@ -42,7 +41,8 @@ struct AddView: View {
 				}
 				ToolbarItem(placement: .confirmationAction) {
 					Button("Save") {
-						expenses.allItens.append(ExpenseItem(name: expenseDescription, type: expenseType, amount: expenseAmount))
+						let newItem = ExpenseItem(name: expenseDescription, type: expenseType, amount: expenseAmount)
+						modelContext.insert(newItem)
 						dismiss()
 					}
 				}
@@ -51,9 +51,6 @@ struct AddView: View {
 	}
 }
 
-// Preview provider, assuming you have a preview environment set up
-struct AddView_Previews: PreviewProvider {
-	static var previews: some View {
-		AddView(expenses: Expenses())
-	}
+#Preview {
+	AddView()
 }

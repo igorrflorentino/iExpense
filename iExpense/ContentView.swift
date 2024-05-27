@@ -7,50 +7,47 @@
 
 
 import SwiftUI
+import SwiftData
 
 struct ContentView: View {
+	@Environment(\.modelContext) var modelContext
 	
-	@State private var expenses = Expenses()
 	@State private var showingAddExpense = false
+	@State private var sort = [SortDescriptor(\ExpenseItem.name)]
+	@State private var type = "All"
 	
-    var body: some View {
+	var body: some View {
 		NavigationStack{
-			List{
-				ExpenseSection(title: "Personal", filteredItens: expenses.personalItens, removeUsing: removePersonalItems)
-				ExpenseSection(title: "Business", filteredItens: expenses.businessItens, removeUsing: removeBusinessItems)
-			}
-			.navigationTitle("iExpense")
-			.toolbar(content: {
-				NavigationLink(destination: AddView(expenses: expenses)) {
-					Image(systemName: "plus")
-				}
-			})
+			ExpensesList(type: type, sort: sort)
+				.navigationTitle("iExpense")
+				.toolbar(content: {
+					NavigationLink(destination: AddView()) {
+						Image(systemName: "plus")
+					}
+					Menu("sort", systemImage: "arrow.up.arrow.down"){
+						Picker("sort", selection: $sort) {
+							Text("Sort by name")
+								.tag([SortDescriptor(\ExpenseItem.name)])
+							Text("Sort by amount")
+								.tag([SortDescriptor(\ExpenseItem.amount)])
+						}
+					}
+					Menu("filter", systemImage: "line.horizontal.3.decrease"){
+						Picker("filter", selection: $type) {
+							Text("Show all")
+								.tag("All")
+							Divider()
+							ForEach(ExpenseItem.allTypes, id: \.self) {
+								Text($0)
+							}
+						}
+					}
+				})
 		}
-    }
-	
-	func removeItems(at offSets: IndexSet, in UIArray: [ExpenseItem]){
-		var originalOffsets = IndexSet()
-		
-		for offset in offSets{
-			let itemToDelet = UIArray[offset]
-			if let originalOffset = expenses.allItens.firstIndex(of:itemToDelet){
-				originalOffsets.insert(originalOffset)
-			}
-		}
-		
-		expenses.allItens.remove(atOffsets: originalOffsets)
 	}
-	
-	func removePersonalItems(at offSets: IndexSet){
-		removeItems(at: offSets, in: expenses.personalItens)
-	}
-	
-	func removeBusinessItems(at offSets: IndexSet){
-		removeItems(at: offSets, in: expenses.businessItens)
-	}
-	
 }
 
 #Preview {
-    ContentView()
+	ContentView()
+		.modelContainer(for: ExpenseItem.self)
 }
